@@ -62,6 +62,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_cube:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "483f7777d24def3d07d0e7261dabdbb841d1db5e"
+      url: "https://github.com/mingl1/flutter_cube"
+    source: git
+    version: "0.1.0"
   flutter_lints:
     dependency: "direct dev"
     description:
