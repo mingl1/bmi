@@ -5,7 +5,8 @@ import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'const.dart' as Constants;
 
 void main() {
-  runApp(Phoenix(child:MaterialApp(
+  runApp(Phoenix(
+      child: MaterialApp(
     home: MyApp(),
     title: "BMI Calculator",
     debugShowCheckedModeBanner: false,
@@ -30,15 +31,20 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   late double to;
   late TextField weight;
   late TextField height;
+  late TextField age;
+  final List<bool> isSelected = <bool>[];
+
   late FloatingActionButton _floating;
   final List<TextEditingController> textControllers = <TextEditingController>[];
 
   int phase = 0;
+
   @override
   void initState() {
     super.initState();
     for (int i = 0; i < 2; i++) {
       textControllers.add(TextEditingController());
+      isSelected.add(false);
     }
     _animationController = AnimationController(
       vsync: this,
@@ -105,6 +111,13 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
       autofocus: false,
       keyboardType: TextInputType.number,
       controller: textControllers[1],
+    );
+    age = TextField(
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(), hintText: 'Enter your age in years'),
+      maxLines: 1,
+      autofocus: false,
+      keyboardType: TextInputType.number,
     );
     _floating = FloatingActionButton(
         onPressed: tap,
@@ -176,6 +189,19 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
       },
     );
 
+    String calculate(double bmi) {
+      String response = bmi.toStringAsFixed(2) + "\n you are \n";
+      if (bmi < 18.5)
+        response += "underweight";
+      else if (bmi >= 30)
+        response += "obese";
+      else if (bmi >= 25)
+        response += "overweight";
+      else
+        response += "healthy";
+      return response;
+    }
+
 //shading as pages turn
     Animatable<Color?> background = TweenSequence<Color?>([
       TweenSequenceItem(
@@ -218,17 +244,15 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
                           '     Your \n   BMI \n is: \n' +
-                              (double.parse(textControllers[0].text) /
-                                      2.205 /
-                                      (math.pow(
-                                          (double.parse(
-                                                  textControllers[1].text) /
-                                              39.37),
-                                          2)))
-                                  .toStringAsFixed(2),
+                              calculate((double.parse(textControllers[0].text) /
+                                  2.205 /
+                                  (math.pow(
+                                      (double.parse(textControllers[1].text) /
+                                          39.37),
+                                      2)))),
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 55,
+                              fontSize: 48,
                               shadows: [
                                 const Shadow(
                                     blurRadius: 10,
@@ -304,16 +328,32 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
               child: Container(
                 color: Constants.infoPage,
                 alignment: Alignment.topCenter,
-                child: Column(children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: weight,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: height,
-                  ),
-                ]),
+                  child: ListView(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: weight,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: height,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: age,
+                    ),
+                    ToggleButtons(
+                      children: <Widget>[
+                        Icon(Icons.male),
+                        Icon(Icons.female),
+                      ],
+                      onPressed: (int index) {
+                        setState(() {
+                          isSelected[index] = !isSelected[index];
+                        });
+                      },
+                      isSelected: isSelected,
+                    ),
+                  ]),
               ),
               alignment: Alignment.center,
               transform: Matrix4.identity()
